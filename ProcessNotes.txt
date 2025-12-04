@@ -1,0 +1,10 @@
+1. The __init__.py means the website folder is a python package and allows us to import anything from into somewhere else.
+2. Flask is lightweight python framework that allows you to make website very quickly and easily. to install run two commands: 'pip install flask' and 'pip install flask-login'
+3. Configure your init.py file as shown
+4. Configure main.py file. 
+5. setup the routes for the website. Go to the views.py file and import Blueprint (this allows everything to be organised neatly) then write the "views = Blueprint.." command. Repeat this also for the auth file as per shown.
+6. Then add your url paths for each page you need.
+7. Register each page and Blueprint in the init.py file. When you register the blueprints, whatever you set the url prefix to will prefix the actual url you set in the views/auth files. 
+8. in your auth.py file define the routes for each of the pages which will be associated with the authentication process (i.e. login, logout and signup)
+[19 Minutes In]
+
