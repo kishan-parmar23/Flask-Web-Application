@@ -18,8 +18,23 @@
 12. Next you build out things like your navbar using standard bootstrap
 13. Then create your child template. Starting with the extend syntax. See:https://jinja.palletsprojects.com/en/stable/templates/#child-template
 14. once the child template is defined, you have to render it so it can be seen on the screen. Go to view.py, import the render_template function from Flask and then change the route to return the newly defined template . 
-15. 
+15. whenever you are importing or want to use flask, you have to include is an imported item. 
+16. Once the page is rendering the appropriate, you can continue to use blocks to add page specific content. If the view is authentication orientated page, done in auth.py. If it is a standard view, then view.py. 
+17. To pass a variable through to be displayed in the front, you have initialise it in the view.py/auth.py files. To then render that in the template, you have to use two squiggly brackets like below:
+
+{{ text }}
+
+18. To do an if statement it is as follows:
+
+{% if boolean == True %}
+    This variable is True
+{% endif %}
+
+You have your if/else (python) is squiggly and percent signs and then the content to display in those scenarios is contained within. 
 
 
 [19 Minutes In]
+
+18. Need to tell each of the end points which HTTP Requests they accept by adding the information to the auth.py files.
+19. when configuring the form, it is the name attribute which helps the post request know what label to assign to the data in the database. 
 
