@@ -2,9 +2,24 @@
 2. Flask is lightweight python framework that allows you to make website very quickly and easily. to install run two commands: 'pip install flask' and 'pip install flask-login'
 3. Configure your init.py file as shown
 4. Configure main.py file. 
-5. setup the routes for the website. Go to the views.py file and import Blueprint (this allows everything to be organised neatly) then write the "views = Blueprint.." command. Repeat this also for the auth file as per shown.
+5. setup the routes for the website. Go to the views.py file and import Blueprint (this allows everything to be organized neatly) then write the "views = Blueprint.." command. Repeat this also for the auth file as per shown.
 6. Then add your url paths for each page you need.
 7. Register each page and Blueprint in the init.py file. When you register the blueprints, whatever you set the url prefix to will prefix the actual url you set in the views/auth files. 
 8. in your auth.py file define the routes for each of the pages which will be associated with the authentication process (i.e. login, logout and signup)
+9. next is the templates folder. This is used for the html that is going to be displayed for each page. We use a framework call Jinja to help us run python without our html pages rather than javascript. When reading documentation, you need to focus on the Template Designer Documentation.
+10. Create a base.html file which is going to act as the bases for all future templates. In here, initialize the html and add in your bootstrap links (both for the css and javascript). Here you are going to use "Blocks" - these are sections which can be overridden by a child template. Learn about blocks here: https://jinja.palletsprojects.com/en/stable/templates/#base-template
+11. Anything that does not change, (i.e. images, css or javascript files) are put inside of the static folder. You then load them into your base.html file using a particular script. this is put at the bottom of the body:
+
+    <script>
+        type="text/javascript"
+        src="{{ url_for('static', filename='index.js') }}"   --> this tells us to pull the url for the site when it is live, and look for the "static" folder. Then in there is a file call index.js. The squiggly brackets allow for us to write python. 
+    </script>
+
+12. Next you build out things like your navbar using standard bootstrap
+13. Then create your child template. Starting with the extend syntax. See:https://jinja.palletsprojects.com/en/stable/templates/#child-template
+14. once the child template is defined, you have to render it so it can be seen on the screen. Go to view.py, import the render_template function from Flask and then change the route to return the newly defined template . 
+15. 
+
+
 [19 Minutes In]
 
