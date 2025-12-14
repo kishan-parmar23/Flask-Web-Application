@@ -37,4 +37,78 @@ You have your if/else (python) is squiggly and percent signs and then the conten
 
 18. Need to tell each of the end points which HTTP Requests they accept by adding the information to the auth.py files.
 19. when configuring the form, it is the name attribute which helps the post request know what label to assign to the data in the database. 
+20. for displaying success and error messages we use the Flash function. if there are different messages and different scenarios, we use the flash with categories: https://flask.palletsprojects.com/en/stable/patterns/flashing/#simple-flashing. You can us the IF and Else clauses to show different messages with different categories. Note also you can loop through two arrays at the same time and then check each one at different points in the if statement:
+
+
+        {% with messages = get_flashed_messages(with_categories=true) %} 
+            {% if messages %} 
+            {% for category, message in messages %} 
+                {% if category =='error' %}
+                <div class="alert alert-danger alter-dismissable fade show" role="alert">
+                {{ message }}
+                <button type="button" class="close" data-dismiss="alert">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                </div>
+            {% else %}
+            <div class="alert alert-success alter-dismissable fade show" role="alert">
+            {{ message }}
+            <button type="button" class="close" data-dismiss="alert">
+                <span aria-hidden="true">&times;</span>
+            </button>
+            </div>
+            {% endif %} {% endfor %} {% endif %} {% endwith %}
+
+
+ESTABLISHING THE DATABASE 
+
+This tutorial is great: https://www.geeksforgeeks.org/python/connect-flask-to-a-database-with-flask-sqlalchemy/ 
+
+1. in the __init__.py file, import you flask_sqlalchemy and initialise the database:
+
+        from flask_sqlalchemy import SQLAlchemy
+
+        db = SQLAlchemy()
+        DB_Name = "database.db"
+
+2. tell the flask application (__init__.py file) where the database is located for future queries to and from said database:
+
+    app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DB_Name}'
+    db.init_app(app)
+
+3. You then need to define the schema for the database. this is done in he models.py file. You have to import from the package (which is represented by a single dot) the database. If you are outside of the directory, you will replace the dot with the site you are importing from. So simply writing:
+
+    from . import db
+
+4. Also need to import the flask_login package which helps manage who can access these database. 
+5. Define the columns for the different tables of data you want to store. you also, as with any database, need to define the data type and lengths that can be stored in that column:
+
+        class User(db.Model, UserMixin):
+            id = db.Column(db.Integer, primary_key=True)
+            email = db.Column(db.String(150), unique=True)
+            password = db.Column(db.String(150))
+            first_name = db.Column(db.String(150))
+
+6. After the tables are established, you have to associate each note with a user. You use foreign key to do this. This is a column in your database which always references another column in another database. To reference another database in the directory, simply write nameOfDatabase.columnName
+If it is a one to many relationship (each user has many notes) you typically want to put the foreign key on the many item (in this case notes). You also want to reference the primary_key column. When referencing foreign key, the database name should start with lower case
+
+Then you need to add a column which contains a list of all of the notes associated with that database. This is done by:
+
+    notes = db.relationship('Note')
+
+7. Then in the __init__.py file, you have to import and initialise the database during the program start-up. Write a function for the initialisation and call it after importing the models you have defined. 
+
+        ...refix='/')
+        
+        import .models
+        
+        create_database(app)
+        
+        return app
+
+    def create_database(app):
+        if not path.exists('website/' + DB_Name):
+            db.create_all(app=app)
+            print('Database Created!')
+
 
