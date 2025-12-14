@@ -106,9 +106,67 @@ Then you need to add a column which contains a list of all of the notes associat
         
         return app
 
-    def create_database(app):
-        if not path.exists('website/' + DB_Name):
-            db.create_all(app=app)
-            print('Database Created!')
+def create_database(app):
+    if not path.exists('website/' + DB_Name):
+        with app.app_context():
+            db.create_all()
+        print('Database Created!') ----> note that with newer versions of flask, you have to do use the with function. 
 
+CREATING USERS
 
+1. To create a new user, in the auth.py file, under the if elseif tree, where the user has successfully entered the appropriate criteria, add the following:
+
+    new_user = User(email=email, first_name=first_name, password=generate_password_hash(password1, method='sha256'))
+    db.session.add(new_user) --> this establishes the user and then the second line commits it the database. 
+    b.session.commit()
+
+to access the database fields, you have to import the database:
+
+    from .models import User
+
+2. You also need to import the flask_login functionality and apply. You also need to import a password hasher to encrypt and decrypt passwords:
+
+    from werkzeug.security import generate_password_hash, check_password_hash
+
+3. Lastly after the user has created the database, we need to take them to the home page so their experience makes sense. use the flask redirect and url_for bahaviors to do this. Again these need to be imported first. 
+
+4. Now users can sign-up you have to authenticate the user when signing in. This is done by (note that you do not need to provide the hashing method again):
+
+    if request.method == 'POST':
+        email = request.form.get('email')
+        password = request.form.get('password1')
+        
+        user = User.query.filter_by(email=email).first()
+        if user:
+            if check_password_hash(user.password, password):
+                flash('Logged in successfully!', category='success')
+                return redirect(url_for('views.home'))
+            else:
+                flash('Incorrect password, try again.', category='error')
+        else:
+            flash('Email does not exist.', category='error')
+
+5. Once a user is logged in, they should see certain things, and then when they are logged out, they should see certain things. This is done with the flask_login module. https://flask-login.readthedocs.io/en/latest/
+In your auth.py login function, after the user has been authenticated, add the following line. You will also want to add the same for after a user has correctly signed-up
+
+        login_user(user, remember=True)
+
+6. For logout, for that end point, add the following. The @login_required ensure someone cannot access that page unless they had logged in. 
+
+            @auth.route('/logout')
+            @login_required
+            def logout()
+                logout_user()
+                return render_template("logout.html")
+
+    similarly, in the views.py file, you need to add a login_required to ensure no one can get there unless they are logged into the system. 
+
+7. Lastly, to help us know who the logged in user is and to have their credentials to hand. This is done with the login manager, first import to your init file
+
+from flask_login import LoginManager
+
+8. then after the database is initialised within the file, add the following 
+    
+    Login_manager = LoginManager()
+    Login_manager.login_view = 'auth.login'
+    Login_manager.init_app(app)

@@ -10,6 +10,9 @@ def create_App():
     app.config['SECRET_KEY'] = 'oiewrunfmcoiweh'
     app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DB_Name}'
     db.init_app(app)
+    from flask_login import LoginManager
+    
+     
     
     from .views import views 
     from .auth import auth
@@ -21,6 +24,14 @@ def create_App():
     
     create_database(app)
     
+    Login_manager = LoginManager()
+    Login_manager.login_view = 'auth.login'
+    Login_manager.init_app(app)
+    
+    @Login_manager.user_loader
+    def load_user(id):
+        return User.query.get(int(id))
+     
     return app
 
 def create_database(app):
