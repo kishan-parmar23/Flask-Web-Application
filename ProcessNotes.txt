@@ -170,3 +170,76 @@ from flask_login import LoginManager
     Login_manager = LoginManager()
     Login_manager.login_view = 'auth.login'
     Login_manager.init_app(app)
+
+
+9. To know if a user is logged in or not, and to then use this to control what they do and do not see, we use the current_user module from flask_login. In your views.py file, pass the the current_user as a variable into the view so i can be called on. 
+
+        ... home():
+    return render_template("home.html", user = current_user)
+
+    Then, in your base template for example, you can use an if statement to check if the user is logged in and then show specific content:
+        
+        ...
+        <div class="collapse navbar-collapse" id="navbar">
+        <div class="navbar-nav">
+          {% if current_user.is_authenticated %}
+          <a class="nav-item nav-link" id="home" href="/">Home</a>
+          <a class="nav-item nav-link" id="logout" href="/logout">Logout</a>
+          {% else %}
+          <a class="nav-item nav-link" id="login" href="/login">Login</a>
+          <a class="nav-item nav-link" id="signup" href="/sign-up">Sign Up</a>
+          {% endif %}
+
+    Another example of accessing the data associated with a user is via: 
+
+            <ul class="list-group list-group-flush" id="notes">
+            {% for note in user.notes %}
+                <li class = "list-group-item">{% note.data %}</li>
+            {% endfor %}
+            </ul>
+
+9. NOTE:
+
+ {% ... %} (The Percent Sign): This is for Logic/Statements. Jinja expects a command like if, for, else, or endfor. When you put {% note %}, Jinja thinks you are trying to start a new logic block called "note," which doesn't exist.
+
+{{ ... }} (The Double Curly Braces): This is for Expressions/Data. This is what you use when you want to actually "print" or display the content of a variable to the screen.
+
+10. If you ever have a button which needs to execute a post or get request to a database, you cannot do this exclusively with python. Only with a form, is it possible because the form handled the javascript required to make the post request. Other buttons require you to write the javascript yourself.
+To do this, in the respective file, add the button and call a javascript function for the behavior. You will need to pass in the id of the object you are going to manipulate:
+
+This video explains more: https://www.youtube.com/watch?v=b7GBRDJyZ3E&t=18s 
+
+            <ul class="list-group list-group-flush" id="notes">
+                {% for note in user.notes %}
+                <li class = "list-group-item">{{ note.data }}
+                    <button type="button" class="close" onClick = "deleteNote('{{ note.id }}')">
+                        span aria-hidden = "true">&times;</span>
+                    </button>
+                </li>
+                {% endfor %}
+            </ul>
+    Then, in the index.js file, which should be referenced a script in the base html page, add the following to make the fetch request to your custom end-point.
+    The end-point is then configured in the view.py file to handle the fetch request and update the data.
+
+        function deleteNote(noteId) {
+            fetch('/delete-note', {
+                method: 'POST',
+                body: JSON.stringify({ noteId: noteId }),
+            }).then((_res) => {
+                window.location.href = "/";
+            });
+        }
+
+    Then in view.py, the end point looks like. Now the request is not going to come in as a form, so you have to handle the json data structure instead. You will also need to import jsonify module as well. 
+
+            @views.route('/delete-note', methods=['POST'])
+            def delete_note():
+                note = json.loads(request.data)
+                noteId = data['noteId']
+                note = Note.query.get(noteId)
+                if note:
+                    if note.user_id == current_user.id:
+                        db.session.delete(note)
+                        db.session.commit()
+                        return jsonify({})
+                return {}
