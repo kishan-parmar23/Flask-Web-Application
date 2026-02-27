@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}AI Helper{% endblock %}
+{% block content %}
+<h1 class="mt-3 mb-3" align="center">Improve Your Error Report</h1>
+
+<p>
+  Paste an error message or bug report below. The checker will review it
+  against a set of heuristics and, when available, an AI assistant will
+  suggest concrete improvements.
+</p>
+
+<form method="POST" class="mb-4">
+  <div class="form-group">
+    <label for="message">Error message or bug report</label>
+    <textarea
+      class="form-control"
+      id="message"
+      name="message"
+      rows="8"
+      placeholder="Describe the problem, steps to reproduce, what you expected, what actually happened, and your environment..."
+    >{{ message or "" }}</textarea>
+  </div>
+  <div align="center">
+    <button type="submit" class="btn btn-primary">Analyze</button>
+  </div>
+</form>
+
+{% if analysis %}
+  <h3>Checklist</h3>
+  <p>Overall score: <strong>{{ analysis.score }}</strong>/100</p>
+
+  <ul class="list-group mb-4">
+    {% for check in analysis.checks %}
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        <div>
+          <strong>{{ check.name }}</strong><br />
+          <small class="text-muted">{{ check.detail }}</small>
+        </div>
+        {% if check.ok %}
+          <span class="badge badge-success badge-pill">OK</span>
+        {% else %}
+          <span class="badge badge-warning badge-pill">Improve</span>
+        {% endif %}
+      </li>
+    {% endfor %}
+  </ul>
+{% endif %}
+
+{% if ai_feedback %}
+  <h3>AI feedback</h3>
+  <div class="card mb-4">
+    <div class="card-body" style="white-space: pre-line;">
+      {{ ai_feedback }}
+    </div>
+  </div>
+{% endif %}
+
+{% endblock %}
+
